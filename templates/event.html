@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+        <title>Conference</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.current-month{
+font-size:40px;
+}
+.current-month i{
+font-size:30px;
+}
+.table td{
+    font-size:30px;
+}
+.table th{
+    background:#F8F8F8;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="container" style="max-width:100%;text-align:center;padding:100px;">
+        <table class="table" >
+            <tr><th><h1>Τίτλος</h1></th><td>{% if event.title %}{{ event.title }}{% endif %}</td></tr>
+            <tr><th><h2>Αίθουσα</h2></th><td>{% if event.name %}{{ event.name }}{% endif %}</td></tr>
+            <tr><th><h2><i class="fa fa-calendar" aria-hidden="true"></i>Ημερομηνία</h2></th><td>{% if event.scheduled %}{{ event.scheduled|get_date }}{% endif %}</td></tr>
+            <tr><th><h2><i class="fa fa-clock-o" aria-hidden="true"></i>Ώρα</h2></th><td>{% if event.scheduled %}{{ event.scheduled|get_time }}{% endif %} - {% if event.endtime %}{{ event.endtime|get_time }}{% endif %}</td></tr>
+            <tr><th><h2>Σημειώσεις</h2></th><td>{% if event.notes %}{{ event.notes }}{% endif %}</td></tr>
+            <tr><th><h2>Συμμετέχοντες</h2></th>
+                <td>
+                    {% if event.participants %}
+                {% for prts in event.participants %}
+                    {{ prts }}<br>
+                {% endfor %}
+                    {% endif %}
+                </td></tr>
+        </table>
+    <a href="/event_edit/{{event.id}}">Επεξεργασία</a>&emsp;&emsp;
+    <a href="#" onclick="confirm_delete();" style="color:red">Διαγραφή</a>&emsp;&emsp;
+    {% if event.participants %}<a href="/send_mail/{{event.id}}">Αποστολή email στους συμμετέχοντες</a>{% endif %}
+    </div>
+  <sidebar>
+    <div class="avatar">
+      <div class="avatar__img">
+        <img src="http://www.geoanalysis.gr/images/logo.png" alt="avatar">
+      </div>
+      <div class="avatar__name"></div>
+    </div>
+    <nav class="menu">
+      <a class="menu__item menu__item--active" href="/">
+        <i class="menu__icon fa fa-calendar"></i>
+        <span class="menu__text">calendar</span>
+      </a>
+    </nav>
+                <span id="appname">
+              <img src="{{ url_for('static', filename='img/conference.png') }}" alt="avatar">
+    Conference</span>
+  </sidebar>
+</div>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    function confirm_delete(){
+        var r = confirm("Είστε σίγουρος οτι θέλετε να διαγράψετε αυτή την συνάντηση;");
+        if (r == true) {
+            window.location.href='/event_delete/{{event.id}}';
+        } else {
+            return;
+        }
+    }
+</script>
+</html>

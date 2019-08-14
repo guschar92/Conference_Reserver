@@ -1,0 +1,15 @@
+<table border="1" style="width:100%;">
+    <tr><th style="background:#F8F8F8;text-align:left;"><h2>Τίτλος</h2></th><td>{{ event.title }}</td></tr>
+    <tr><th style="background:#F8F8F8;text-align:left;"><h2>Αίθουσα</h2></th><td>{{ event.name }}</td></tr>
+    <tr><th style="background:#F8F8F8;text-align:left;"><h2>Έναρξη</h2></th><td>{{ event.scheduled }}</td></tr>
+    <tr><th style="background:#F8F8F8;text-align:left;"><h2>Λήξη</h2></th><td>{{ event.endtime }}</td></tr>
+    <tr><th style="background:#F8F8F8;text-align:left;"><h2>Σημειώσεις</h2></th><td>{{ event.notes }}</td></tr>
+    <tr><th style="background:#F8F8F8;text-align:left;"><h2>Συμμετέχοντες</h2></th>
+        <td>
+            {% if event.participants %}
+        {% for prts in event.participants %}
+            {{ prts }}<br>
+        {% endfor %}
+            {% endif %}
+        </td></tr>
+</table>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conference</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.current-month{
+font-size:40px;
+}
+.current-month i{
+font-size:30px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <main>
+    <div class="toolbar">
+      <div class="toggle">
+          <div class="toggle__option toggle__option--selected" onclick="window.location.href='/'">Σήμερα</div>
+          <div class="toggle__option" onclick="window.location.href='/event_new'">Νέα συνάντηση</div>
+      </div>
+      <div class="current-month">
+            <a href="#" onclick="prev_year({{current_month}});"><i title="Προηγούμενο έτος" class="fa fa-angle-double-left"></i></a>
+            <a href="#" onclick="prev_month();"><i title="Προηγούμενος μήνας" class="fa fa-angle-left"></i></a>
+          {{month_year_text}}
+          <a href="#" onclick="next_month();"><i title="Έπόμενος μήνας" class="fa fa-angle-right"></i></a>
+          <a href="#" onclick="next_year({{current_month}});"><i title="Επόμενο έτος" class="fa fa-angle-double-right"></i></a>
+      </div>
+      <div class="search-input">
+<!--        <input type="text" value="What are you looking for?">-->
+<!--        <i class="fa fa-search"></i>-->
+      </div>
+    </div>
+
+      <div class="container" style="max-width:100%">
+
+      <div class="calendar">
+          <div class="row calendar__header">
+              <div class="col-2">mon</div>
+              <div class="col-2">tue</div>
+              <div class="col-2">wed</div>
+              <div class="col-2">thu</div>
+              <div class="col-2">fri</div>
+              <div class="col-2">sat</div>
+              <div class="col-2">sun</div>
+          </div>
+      </div>
+
+
+      <div class="row calendar__week">
+        {% for empty in range(0,first_weekday) %}
+          <div class="col-2 calendar__day day"></div>
+        {% endfor %}
+        {% for day in range(1,days+1) %}
+           {% if day != current_day %}
+          <div class="col-2 calendar__day day">
+              <a href="/event_new/{{current_year}}-{{current_month}}-{{day}}">{{ day }}</a>
+              {% for event in events %}
+                  {% if event.scheduled|get_day == day %}
+            <div class="event room{{event.room}}" title="Αίθουσα: {{event.name}}&#013;Σημειώσεις: {{event.notes}}" onclick="window.location.href='/event/{{event.id}}'">
+                <b>{{event.title}}</b><br>[{{event.scheduled|get_time()}} - {{event.endtime|get_time()}}]</div>
+                  {% endif %}
+              {% endfor %}
+              </div>
+          {% else %}
+          <div class="col-2 calendar__day day current">
+                <a href="/event_new/{{current_year}}-{{current_month}}-{{day}}">{{ day }}</a>
+              {% for event in events %}
+                  {% if event.scheduled|get_day == day %}
+            <div class="event room{{event.room}}" title="Αίθουσα: {{event.name}}&#013;Σημειώσεις: {{event.notes}}" onclick="window.location.href='/event/{{event.id}}'">
+                <b>{{event.title}}</b><br>[{{event.scheduled|get_time()}} - {{event.endtime|get_time()}}]</div>
+                  {% endif %}
+              {% endfor %}
+              </div>
+          {% endif %}
+        {% endfor %}
+
+      </div>
+
+
+    </div>
+  </main>
+  <sidebar>
+
+    <div class="avatar">
+      <div class="avatar__img">
+        <img src="http://www.geoanalysis.gr/images/logo.png" alt="avatar">
+      </div>
+      <div class="avatar__name"></div>
+    </div>
+    <nav class="menu">
+      <a class="menu__item menu__item--active" href="/">
+        <i class="menu__icon fa fa-calendar"></i>
+        <span class="menu__text">calendar</span>
+      </a>
+      <a class="menu__item menu__item--active room1" href="#">
+        <i class="menu__icon fa fa-calendar"></i>
+        <span class="menu__text">1ος Όροφος</span>
+          <input type="checkbox" checked id="room1_selector" onchange="selected_rooms();"/>
+      </a>
+      <a class="menu__item menu__item--active room2" href="/">
+        <i class="menu__icon fa fa-calendar"></i>
+        <span class="menu__text">3ος Όροφος</span>
+          <input type="checkbox" checked id="room2_selector"   onchange="selected_rooms();"/>
+      </a>
+    </nav>
+          <span id="appname">
+              <img src="{{ url_for('static', filename='img/conference.png') }}" alt="avatar">
+    Conference</span>
+  </sidebar>
+</div>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+    function next_month(){
+        var nextmonth = {{current_month}} + 1;
+        var year = window.location.pathname.split('/')[2];
+        if (nextmonth > 12){
+            nextmonth = 1;
+            next_year(nextmonth);
+            return;
+        }
+        if (year){
+            window.location.href = '/'+nextmonth+'/'+year;
+        }
+        else{
+            window.location.href = '/'+nextmonth;
+        }
+    }
+
+    function next_year(month){
+        var nextyear = {{current_year}} + 1;
+        window.location.href = '/'+month+'/'+nextyear;
+    }
+
+    function prev_month(){
+        var nextmonth = {{current_month}} -1;
+        var year = window.location.pathname.split('/')[2];
+        if (nextmonth < 1){
+            nextmonth = 12;
+            prev_year(nextmonth);
+            return;
+        }
+        if (year){
+            window.location.href = '/'+nextmonth+'/'+year;
+        }
+        else{
+            window.location.href = '/'+nextmonth;
+        }
+    }
+
+    function prev_year(month){
+        var nextyear = {{current_year}} - 1;
+        window.location.href = '/'+month+'/'+nextyear;
+    }
+
+    function selected_rooms(){
+        if ($('#room1_selector').is(':checked')){
+            $('.event.room1').show();
+        }
+        else{
+            $('.event.room1').hide();
+        }
+        if ($('#room2_selector').is(':checked')){
+            $('.event.room2').show();
+        }
+        else{
+            $('.event.room2').hide();
+        }
+    }
+</script>
+</html>

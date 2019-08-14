@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+        <title>Conference</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon-32x32.png') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+.current-month{
+font-size:40px;
+}
+.current-month i{
+font-size:30px;
+}
+.table td{
+    font-size:30px;
+}
+.table td input, select, textarea{
+    width:75%;
+}
+.table th{
+    background:#F8F8F8;
+}
+#participants{
+    min-height:200px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="container" style="max-width:100%;text-align:center;padding:100px;">
+        <form method="POST" id="saveform" action="/save_event/{{event.id}}">
+        <table class="table" >
+            <tr><th><h1>Τίτλος</h1></th><td><input type='text' name="title" value='{% if event.title %}{{ event.title }}{% endif %}'></td></tr>
+            <tr><th><h2>Αίθουσα</h2></th><td>
+                <select name="room">
+                    {% if event.room == 1 %}
+                    <option value="1" selected>1ος Όροφος</option>
+                    <option value="2">3ος Όροφος</option>
+                    {% else %}
+                    <option value="1">1ος Όροφος</option>
+                    <option value="2" selected>3ος Όροφος</option>
+                    {% endif %}
+                </select>
+                </td></tr>
+            <tr><th><h2><i class="fa fa-calendar" aria-hidden="true"></i>
+                Ημερομηνία</h2></th>
+                <td>
+                    <span style="display:inline-flex;width:75%;">
+                        <input style="width:100%;" value='{% if event.scheduled %}{{ event.scheduled|get_date }}{% endif %}' type="date" name="sch_date"/>
+
+                    </span>
+                </td></tr>
+            <tr><th><h2><i class="fa fa-clock-o" aria-hidden="true"></i>
+                Ώρα</h2></th><td>
+                <span style="display:inline-flex;width:75%;">
+                    <input value='{% if event.scheduled %}{{ event.scheduled|get_time }}{% endif %}' type="time" name="sch_time"/>&nbsp;έως&nbsp;
+<!--                    <input value='{% if event.endtime %}{{ event.endtime|get_date }}{% endif %}' type="date" name="end_date"/>-->
+                    <input value='{% if event.endtime %}{{ event.endtime|get_time }}{% endif %}' type="time" name="end_time"/>
+                </span>
+            </td></tr>
+            <tr><th><h2>Σημειώσεις</h2></th><td><input type='text' name="notes" value='{% if event.notes %}{{ event.notes }}{% endif %}'></td></tr>
+            <tr><th><h2>Συμμετέχοντες</h2></th>
+                <td>
+                   <select id="participants_select" class="form-control" name="participants[]" multiple="multiple" >
+                        {% if event.participants %}
+                            {% for prts in event.participants %}
+                              {% for user in users %}
+                                {% if prts == user.email %}
+                                    <option title="{{ user.email}}" value="{{ user.email}}" selected>{{ user.fullname }}</option>
+                                {% endif %}
+                               {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                        {% for user in users %}
+                        <option title="{{ user.email}}" value="{{ user.email}}">{{ user.fullname }}</option>
+                        {% endfor %}
+                    </select><br>
+                </td></tr>
+        </table>
+    <a href="#" onclick="document.getElementById('saveform').submit();">Αποθήκευση</a>
+            </form>
+
+    </div>
+  <sidebar>
+    <div class="avatar">
+      <div class="avatar__img">
+        <img src="http://www.geoanalysis.gr/images/logo.png" alt="avatar">
+      </div>
+      <div class="avatar__name"></div>
+    </div>
+    <nav class="menu">
+      <a class="menu__item menu__item--active" href="/">
+        <i class="menu__icon fa fa-calendar"></i>
+        <span class="menu__text">calendar</span>
+      </a>
+    </nav>
+                <span id="appname">
+              <img src="{{ url_for('static', filename='img/conference.png') }}" alt="avatar">
+    Conference</span>
+  </sidebar>
+</div>
+
+</body>
+<script>
+var _mSelect3 = $("#participants_select").select2();
+</script>
+
+</html>

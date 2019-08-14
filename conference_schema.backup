@@ -1,65 +1,40 @@
--- Table: geonews.announcement
+-- Table: reservations.conference
 
--- DROP TABLE geonews.announcement;
+-- DROP TABLE reservations.conference;
 
-CREATE TABLE geonews.announcement
+CREATE TABLE reservations.conference
 (
   id serial NOT NULL,
+  scheduled timestamp without time zone,
+  room integer,
+  notes text,
   title text,
-  description text,
-  category integer,
-  pinned integer,
-  date_created timestamp without time zone NOT NULL DEFAULT now(),
-  author text,
-  pinned_till timestamp without time zone,
-  severity integer,
-  CONSTRAINT announcement_pkey PRIMARY KEY (id),
-  CONSTRAINT announcement_category_fkey FOREIGN KEY (category)
-      REFERENCES geonews.category (cid) MATCH SIMPLE
+  endtime timestamp without time zone,
+  participants text[],
+  CONSTRAINT conference_pkey PRIMARY KEY (id),
+  CONSTRAINT room_fk FOREIGN KEY (room)
+      REFERENCES reservations.conference_rooms (cid) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE geonews.announcement
+ALTER TABLE reservations.conference
   OWNER TO portal;
 
 
--- Table: geonews.category
+-- Table: reservations.conference_rooms
 
--- DROP TABLE geonews.category;
+-- DROP TABLE reservations.conference_rooms;
 
-CREATE TABLE geonews.category
+CREATE TABLE reservations.conference_rooms
 (
   cid serial NOT NULL,
   name text,
-  CONSTRAINT category_pkey PRIMARY KEY (cid)
+  CONSTRAINT cid_pk PRIMARY KEY (cid)
 )
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE geonews.category
+ALTER TABLE reservations.conference_rooms
   OWNER TO portal;
-
--- Table: geonews."user"
-
--- DROP TABLE geonews."user";
-
-CREATE TABLE geonews."user"
-(
-  user_id serial NOT NULL,
-  name character varying(100),
-  surname character varying(100),
-  email character varying(100),
-  username character varying(100),
-  password character varying(1000),
-  token character varying(1000),
-  note character varying(1000),
-  CONSTRAINT user_pkey PRIMARY KEY (user_id)
-)
-WITH (
-  OIDS=FALSE
-);
-ALTER TABLE geonews."user"
-  OWNER TO portal;
-
